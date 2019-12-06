@@ -1,14 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeFragment">
+    tools:context=".HomeFragment"
+    android:orientation="vertical">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
+        android:id="@+id/homeTitle"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Home" />
+        android:layout_height="wrap_content"
+        android:text="Bad Kung Fu"
+        android:textAlignment="center"
+        android:textSize="36sp"
+        android:textStyle="bold"
+        android:padding="10dp">
 
-</FrameLayout>
+    </TextView>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/homeImage"
+        android:src="@drawable/kungfu_masterr">
+
+    </ImageView>
+
+    <TextView
+        android:id="@+id/homeQuote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Come. Let me introduce my fist to your face."
+        android:textAlignment="center"
+        android:textStyle="italic"
+        android:padding="15dp">
+
+    </TextView>
+
+</LinearLayout>

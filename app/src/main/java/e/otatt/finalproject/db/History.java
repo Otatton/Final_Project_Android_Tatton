@@ -3,11 +3,13 @@ package e.otatt.finalproject.db;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import static androidx.room.ForeignKey.CASCADE;
 
-@Entity(foreignKeys = @ForeignKey(entity = Movies.class,
+@Entity(indices = {@Index(("order_id"))},
+        foreignKeys = @ForeignKey(entity = Movies.class,
         parentColumns = "movie_id",
         childColumns = "order_id",
         onDelete = CASCADE))

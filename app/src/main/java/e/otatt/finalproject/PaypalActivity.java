@@ -159,4 +159,8 @@ public class PaypalActivity extends Activity {
         stopService(new Intent(this, PayPalService.class));
         super.onDestroy();
     }
+
+    private void getInvoiceDetails(){
+
+    }
 }
