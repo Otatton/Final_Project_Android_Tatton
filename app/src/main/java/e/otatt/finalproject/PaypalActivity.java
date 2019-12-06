@@ -2,6 +2,7 @@ package e.otatt.finalproject;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -10,11 +11,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.paypal.android.sdk.payments.PayPalAuthorization;
 import com.paypal.android.sdk.payments.PayPalConfiguration;
 import com.paypal.android.sdk.payments.PayPalFuturePaymentActivity;
@@ -26,9 +30,17 @@ import com.paypal.android.sdk.payments.PaymentConfirmation;
 
 import org.json.JSONException;
 
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+
+import static e.otatt.finalproject.DetailActivity.CART;
+import static e.otatt.finalproject.MyCartFragment.OWNED_ITEMS;
 
 public class PaypalActivity extends Activity {
+    private BigDecimal bigDecimalTotal;
+    private ArrayList<CartItem> cartItems;
 
     private static final String CONFIG_ENVIRONMENT = PayPalConfiguration.ENVIRONMENT_SANDBOX;
 
@@ -49,6 +61,10 @@ public class PaypalActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_paypal);
+        getInvoiceDetails();
+        TextView textView = findViewById(R.id.textView1);
+        DecimalFormat df = new DecimalFormat("0.00");
+        textView.setText(String.format(String.format("Order total: " + df.format(bigDecimalTotal))));
 
         Intent intent = new Intent(this, PayPalService.class);
         intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
@@ -57,8 +73,8 @@ public class PaypalActivity extends Activity {
 
             @Override
             public void onClick(View v) {
-                thingToBuy = new PayPalPayment(new BigDecimal("10"), "USD",
-                        "HeadSet", PayPalPayment.PAYMENT_INTENT_SALE);
+                thingToBuy = new PayPalPayment(bigDecimalTotal, "USD",
+                        "BadKungFu", PayPalPayment.PAYMENT_INTENT_SALE);
                 Intent intent = new Intent(PaypalActivity.this,
                         PaymentActivity.class);
 
@@ -161,6 +177,46 @@ public class PaypalActivity extends Activity {
     }
 
     private void getInvoiceDetails(){
+
+        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString(CART, null);
+        Type type = new TypeToken<ArrayList<CartItem>>(){}.getType();
+        cartItems = gson.fromJson(json, type);
+        if(cartItems == null){
+            cartItems = new ArrayList<>();
+        }
+
+        int temp = 0;
+        for (int i = 0; i < cartItems.size(); i++){
+            temp = temp + cartItems.get(i).getPrice();
+        }
+
+        bigDecimalTotal = new BigDecimal(temp);
+
+        Log.d("JSON", "Cart Json array size: " + cartItems.size());
+
+    }
+
+    private void paymentConfirmedClearCart(){
+
+        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json1 = sharedPreferences.getString(OWNED_ITEMS, null);
+        Type type = new TypeToken<ArrayList<CartItem>>(){}.getType();
+
+        ArrayList<CartItem> tempList = gson.fromJson(json1, type);
+        for(CartItem e : cartItems){
+            tempList.add(e);
+        }
+
+        String json2 =  gson.toJson(tempList);
+        cartItems = null;
+        String json =  gson.toJson(cartItems);
+        editor.putString(CART, json);
+        editor.putString(OWNED_ITEMS, json2);
+        editor.apply();
 
     }
 }
