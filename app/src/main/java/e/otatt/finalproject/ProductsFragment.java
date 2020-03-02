@@ -120,6 +120,7 @@ public class ProductsFragment extends Fragment implements ExampleAdapter.OnItemC
         requestQueue.add(request);
 
     }
+
     @Override
     public void onItemClick(int position) {
         Intent detailIntent = new Intent(getActivity(), DetailActivity.class);
